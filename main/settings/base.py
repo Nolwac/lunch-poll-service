@@ -89,6 +89,7 @@ WSGI_APPLICATION = "main.wsgi.application"
 
 AUTH_USER_MODEL = "users.User"  # user account model
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 
 # Database

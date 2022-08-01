@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework.test import APITestCase
 from rest_framework.views import status
 from rest_framework.authtoken.models import Token
-from .test_user_model import creat_user
+from users.tests.test_model import create_user
 
 # uncomment to send email message
 # settings.EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -24,7 +24,7 @@ class UserAPITest(APITestCase):
 
     def setUp(self):
         # one time setup that applies to all test
-        creat_user(self)
+        create_user(self)
 
         authenticate_client(self)
         self.get_authenticated_user_url = "/api/v1/auth/user/"

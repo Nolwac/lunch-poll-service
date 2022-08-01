@@ -1,32 +1,47 @@
+from typing import Union
 from django.test import TestCase
 from users.models import User
 from django.core.exceptions import ValidationError
+import random
+import string
 
 
-def creat_user(self: TestCase) -> None:
+def create_user(
+    self: TestCase, user_type: Union[User.UserType.EMPLOYEE, User.UserType.RESTAURANT] = User.UserType.EMPLOYEE
+) -> None:
+    random_string1 = "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
+    random_string2 = "".join(random.choices(string.ascii_uppercase + string.digits, k=9))
     self.password = "123-9587hahsng"
-    self.email = "livinusanayo96@gmail.com"
+    self.email = f"{random_string1}@gmail.com"
     self.first_name = "Livinus"
     self.last_name = "Nwafor"
-    self.user_type = User.UserType.EMPLOYEE
-    self.job_title = "Test Engineer"
-    self.description = "Responsible for testing software"
-    self.username = "Nolwac"
-    self.user = User.objects.create_user(
-        email=self.email,
-        username=self.username,
-        password=self.password,
-        first_name=self.first_name,
-        last_name=self.last_name,
-        user_type=User.UserType.EMPLOYEE,
-        job_title=self.job_title,
-        description=self.description,
+    self.username = (
+        f"{random_string1}{random_string2}"  # probability of failure, approximately zero, 1 in a billion billion
     )
+    self.user_type = user_type
+    data = {
+        "email": self.email,
+        "password": self.password,
+        "first_name": self.first_name,
+        "last_name": self.last_name,
+        "username": self.username,
+        "user_type": self.user_type,
+    }
+    if user_type == User.UserType.EMPLOYEE:
+        self.job_title = "Test Engineer"
+        self.description = "Responsible for testing software"
+        data.setdefault("job_title", self.job_title)
+    else:
+        self.restaurant_name = "Test Restaurant"
+        self.description = "Responsible for testing Food Menu for Clients"
+        data.setdefault("restaurant_name", self.restaurant_name)
+    data.setdefault("description", self.description)
+    self.user = User.objects.create_user(**data)
 
 
 class UserTestCase(TestCase):
     def setUp(self):
-        creat_user(self)
+        create_user(self)
 
     def test_that_user_is_correctly_created(self) -> None:
         self.assertEqual(self.user.username, self.username)

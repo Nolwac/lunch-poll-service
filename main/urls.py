@@ -15,6 +15,10 @@ urlpatterns = [
     url(r"api/(?P<version>[v1]+)/auth/", include(("dj_rest_auth.urls", "dj_rest_auth"), namespace="auth_api")),
     url(r"restframework/", include(("rest_framework.urls", "rest_framework"), namespace="rest_framework")),
     url(r"api/(?P<version>[v1]+)/users/", include(("users.api.urls", "users"), namespace="user_api")),
+    url(
+        r"api/(?P<version>[v1]+)/restaurants/",
+        include(("restaurants.api.urls", "restaurants"), namespace="restaurants_api"),
+    ),
     # for dj-rest-auth registration service
     url(r"^accounts/", include("allauth.urls")),
     url(
