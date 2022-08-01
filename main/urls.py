@@ -7,6 +7,22 @@ from rest_framework.permissions import AllowAny
 from allauth.account.views import confirm_email
 from dj_rest_auth.views import PasswordResetConfirmView
 
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+# schema configuration for swagger documentation
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Lunch Poll Service API Docs",
+        default_version="v1",
+        description="API docs for Lunch Poll Service, base OpenAPI Specifications",
+        contact=openapi.Contact(email="livinusanayo96@gmail.com"),
+        license=openapi.License(name="MIT License"),
+    ),
+    public=True,  # to allow any person to access it
+    permission_classes=[AllowAny],  # to allow any person to access it
+)
+
 
 urlpatterns = [
     # setting the base url to be pointing at the admin interface, this should be changed later
@@ -35,20 +51,22 @@ urlpatterns = [
         confirm_email,
         name="account_confirm_email",
     ),
+    # swagger docs (openapi)
+    url(
+        r"^api/(?P<version>[v1]+)/docs/swagger(?P<format>\.json|\.yaml)$",
+        schema_view.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    url(
+        r"^api/(?P<version>[v1]+)/docs/swagger/$",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# including api documentation provided by DRF through coreapi
-urlpatterns.append(
-    url(
-        r"api/v1/documentation/",
-        include_docs_urls(title="Lunch Poll Service API Docs", permission_classes=[AllowAny]),  # type: ignore
-        name="api_docs",
-    )
-)
 
 # There is implementation of version in the API, at this poin the only version that is allowed is only version one
 # But if more API versions are created under same API app package,then those versions numbers can be included through
