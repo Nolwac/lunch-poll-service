@@ -4,6 +4,7 @@ from django.conf import settings
 from rest_framework.test import APITestCase
 from rest_framework.views import status
 from rest_framework.authtoken.models import Token
+from .test_user_model import creat_user
 
 # uncomment to send email message
 # settings.EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -23,14 +24,7 @@ class UserAPITest(APITestCase):
 
     def setUp(self):
         # one time setup that applies to all test
-        self.password = "123-9587hahsng"
-        self.user = User.objects.create_user(
-            email="livinusanayo96@gmail.com",
-            username="Nolwac",
-            password=self.password,
-            first_name="Livinus",
-            last_name="Nwafor",
-        )
+        creat_user(self)
 
         authenticate_client(self)
         self.get_authenticated_user_url = "/api/v1/auth/user/"
@@ -64,6 +58,9 @@ class UserAuthAPITest(APITestCase):
         self.email = "livinusanayo96@gmail.com"
         self.first_name = "Livinus"
         self.last_name = "Nwafor"
+        self.user_type = User.UserType.RESTAURANT
+        self.restaurant_name = "Test Restaurant"
+        self.description = "Responsible for testing food menu for our client company"
         self.username = "Nolwac"
 
         self.registration_url = "/api/v1/registration/"
@@ -74,6 +71,9 @@ class UserAuthAPITest(APITestCase):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "username": self.username,
+            "user_type": self.user_type,
+            "restaurant_name": self.restaurant_name,
+            "description": self.description,
         }
 
         response = self.client.post(self.registration_url, data, format="json")
@@ -103,6 +103,13 @@ class UserAuthAPITest(APITestCase):
     def test_registration_success(self):
         response = self.client.get(self.get_authenticated_user_url, format="json")
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+        pk = response.data["pk"]
+        user = User.objects.get(pk=pk)
+        user_type = response.data["user_type"]
+
+        self.assertEquals(user_type, self.user_type)
+        self.assertEquals(user.profile.description, self.description)
+        self.assertEquals(user.profile.restaurant_name, self.restaurant_name)
 
     def test_registration_resend_email(self):
         resend_email_url = "/api/v1/registration/resend-email/"
@@ -147,7 +154,13 @@ class UserAuthAPITest(APITestCase):
 
         response = self.client.put(user_update_url, user_update_data, format="json")
         phone_response = response.data["phone"]
-        username_response = response.data["username"]
+        username = response.data["username"]
+        pk = response.data["pk"]
+        user = User.objects.get(pk=pk)
+        user_type = response.data["user_type"]
 
-        self.assertEquals(phone_response, phone)
-        self.assertEquals(username_response, new_username)
+        self.assertEquals(user_type, self.user_type)
+        self.assertEquals(phone, phone_response)
+        self.assertEquals(username, new_username)
+        self.assertEquals(user.profile.description, self.description)
+        self.assertEquals(user.profile.restaurant_name, self.restaurant_name)
