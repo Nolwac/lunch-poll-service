@@ -16,7 +16,7 @@ The Infrastructure diagram for deployment to *Azure Container Instance* might be
 
 ![Infrastructure Diagram](infra_diagram.png)
 
-Once the project is running, the endpoint **/api/<version>/docs/swagger/** to view the API docs and interact with it.
+Once the project is running, the endpoint **/api/[version]/docs/swagger/** to view the API docs and interact with it.
 
 ## How it works
 A user account on the platform (Lunch Poll service) is either an *employee*(Employee model) type account or *restaurant* (Restaurant model) type account. As can be seen from the Database schema diagram above the 2 is related to the *User* model by a one to one relationship. Based on the implementation on the *User* model, it's not possible for a *User* instance to have reference to it from both *Restaurant* and *Employee* model instances.
@@ -26,7 +26,7 @@ The implementation makes sure that only *restaurant* type user can create a *Men
 
 Menus to be voted for are Menus uploaded on the particular day of voting, this is achieved by adding *uploaded_date* field to *Menu* so that the implementation can validated if it is eligible for voting or not. The *employee* type user who is allowed to vote only a single *Menu* instance per day for the first version of the API and up to 3 *Menu* instances per day for the second version of the API.
 
-API versioning is *URL* based versioning as can be seen from the *OpenAPI* based docs provided at this endpoint **/api/<version>/docs/swagger/**. For version 1, the API routes traffic to an API view which checks the vote counts that day by the requesting user (employee type). If the count is less than 1 (i.e, 0), then it allows then it implements the vote request for that user. But if the count is greater than 3, it will return a forbidden status code defining that the user is not allowed to vote for more than 1 *Menu* instance.
+API versioning is *URL* based versioning as can be seen from the *OpenAPI* based docs provided at this endpoint **/api/[version]/docs/swagger/**. For version 1, the API routes traffic to an API view which checks the vote counts that day by the requesting user (employee type). If the count is less than 1 (i.e, 0), then it allows then it implements the vote request for that user. But if the count is greater than 3, it will return a forbidden status code defining that the user is not allowed to vote for more than 1 *Menu* instance.
 
 For the version 2, the restricting number of votes is 3, hence, a user can continue voting for more *Menu* instances upto a count of 3, after which the user will be forbidden to vote again for that day. Points are associated to votes for the version 2. default point for version 1 is 1. But version 2 allows the user right to vote minimum of point of 1 and maximum point of 3 for a particular *Menu* instance.
 
